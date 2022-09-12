@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use App\Models\Movie;
 use App\Models\Genre;
 
@@ -17,14 +18,20 @@ class MoviesTableSeeder extends Seeder
      */
     public function run()
     {
+        // $genre = Genre::find(1)->movies()->get()->toArray();
 
-        // я хочу при создании фильма (App\Models\Movie), привязывать его к жанру (App\Models\Genre)
-        // как сделать так, чтобы движок понимал эти связи? 
-        // p.s. еще и дебаг через консоль, это пытка. 
-        $movies = Movie::factory()->count(1)->create();
-        foreach ($movies->genres as $genre) {
+        $movies = Movie::factory()->count(50)->create();
+        foreach ($movies as $movie) {
+            $genre_ids = Arr::flatten(Genre::inRandomOrder()->limit(rand(1, 5))->get('id')->toArray());
+            $movie_id = $movie->id;
+
+            foreach ($genre_ids as $genre_id) {
+                DB::table('movie_genre')->insert([
+                    'movie_id' => $movie_id,
+                    'genre_id' => $genre_id,
+                ]);
+            }
             
-            // print_r($genre);
         }
 
     }

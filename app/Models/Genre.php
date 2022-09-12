@@ -15,7 +15,7 @@ class Genre extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function movies() {
-        return $this->belongsToMany(Movie::class, 'movie_genre', 'genre_id', 'movie_id');
+    public function movies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany {
+        return $this->belongsToMany(Movie::class, 'movie_genre');
     }
 }
