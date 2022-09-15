@@ -14,8 +14,8 @@ class CreateMovieGenreTable extends Migration
     public function up()
     {
         Schema::create('movie_genre', function (Blueprint $table) {
-            $table->foreignId('movie_id')->references('id')->on('movies');
-            $table->foreignId('genre_id')->references('id')->on('genres');
+            $table->foreignId('movie_id')->references('id')->on('movies')->onDelete('cascade');
+            $table->foreignId('genre_id')->references('id')->on('genres')->onDelete('cascade');
             $table->unique(['movie_id', 'genre_id']);
         });
     }

@@ -16,6 +16,10 @@ class GenreController extends Controller
     public function index()
     {
         $data = Genre::all();
+
+        if (!isset($data)) {
+            return response()->json([], 204);
+        }
         return response()->json(['data' => $data], 200);
     }
 
@@ -27,7 +31,13 @@ class GenreController extends Controller
      */
     public function show($id)
     {
-        $data = Genre::find($id)->movies()->paginate(10);
+        $data = Genre::find($id);
+
+        if (!isset($data)) {
+            return response()->json([], 204);
+        }
+        $data->movies()->paginate(10);
+
         return response()->json($data, 200);
     }
 

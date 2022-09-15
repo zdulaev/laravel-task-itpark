@@ -16,6 +16,7 @@ class MovieFactory extends Factory
         return [
             'name' => $this->faker->sentence(3),
             'published' => $this->faker->boolean,
+            'img' => '../default-movie.png',
         ];
     }
 }

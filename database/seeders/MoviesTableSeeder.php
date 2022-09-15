@@ -16,11 +16,9 @@ class MoviesTableSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
-    {
-        // $genre = Genre::find(1)->movies()->get()->toArray();
-
+    public function run() {
         $movies = Movie::factory()->count(50)->create();
+
         foreach ($movies as $movie) {
             $genre_ids = Arr::flatten(Genre::inRandomOrder()->limit(rand(1, 5))->get('id')->toArray());
             $movie_id = $movie->id;
@@ -31,7 +29,6 @@ class MoviesTableSeeder extends Seeder
                     'genre_id' => $genre_id,
                 ]);
             }
-            
         }
 
     }

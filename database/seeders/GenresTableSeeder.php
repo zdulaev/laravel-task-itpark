@@ -12,9 +12,7 @@ class GenresTableSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
-    {
+    public function run() {
         Genre::factory()->count(6)->create();
-
     }
 }

@@ -16,6 +16,10 @@ class MovieController extends Controller
     public function index()
     {
         $data = Movie::with('genres')->paginate(10);
+
+        if (!isset($data)) {
+            return response()->json([], 204);
+        }
         return response()->json($data, 200);
     }
 
@@ -28,6 +32,10 @@ class MovieController extends Controller
     public function show($id)
     {
         $data = Movie::with('genres')->find($id);
+
+        if (!isset($data)) {
+            return response()->json([], 204);
+        }
         return response()->json($data, 200);
     }
 }
