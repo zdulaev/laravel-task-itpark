@@ -8,6 +8,7 @@
 
 <div class="album py-5 bg-light">
     <div class="container">
+        <a href="{{ route('movies.create') }}" class="btn btn-primary mb-3">Add movie</a>
         @if (count($data))
         {{ $data->links() }}
 
@@ -28,9 +29,13 @@
                         @endif
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="btn-group">
-                                <a href="{{ route('movie', $elem->id) }}" class="btn btn-light">View</a>
-                                <a href="{{ route('movie-update', $elem->id) }}" class="btn btn-light">Edit</a>
-                                <a href="{{ route('movie-destroy', $elem->id) }}" class="btn btn-danger">Delete</a>
+                                <a href="{{ route('movies.show', $elem->id) }}" class="btn btn-light">View</a>
+                                <a href="{{ route('movies.edit', $elem->id) }}" class="btn btn-light">Edit</a>
+                                <form class="d-inline-block" method="post" action="{{ route('movies.destroy', $elem->id) }}">
+                                    @method('DELETE')
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
                             </div>
                         </div>
                     </div>

@@ -8,7 +8,7 @@
 <div class="album py-5 bg-light">
     <div class="container">
 
-        <form class="row g-3 needs-validation" method="post" action="{{ route('genre-create') }}">
+        <form class="row g-3 needs-validation" method="post" action="{{ route('genres.store') }}">
             @csrf
             <div class="col-12">
                 <label class="form-label" for="validationCustom01">Название</label> 

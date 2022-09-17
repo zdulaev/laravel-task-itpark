@@ -36,7 +36,7 @@ class GenreController extends Controller
         if (!isset($data)) {
             return response()->json([], 204);
         }
-        $data->movies()->paginate(10);
+        $data = $data->movies()->paginate(10);
 
         return response()->json($data, 200);
     }

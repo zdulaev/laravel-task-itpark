@@ -22,10 +22,16 @@
                 </ul>
                 @endif
                 <p class="col-md-8 fs-4">Creared at: {{$data->updated_at}}</p>
-                <img class="card-img-top mb-3" src="{{ '/images/news/thumbnail/'.$data->img }}">
-                <a href="{{ route('movies') }}" class="btn btn-light">Go back</a>
-                <a href="{{ route('movie-update', $data->id) }}" class="btn btn-light">Edit</a>
-                <a href="{{ route('movie-destroy', $data->id) }}" class="btn btn-danger">Delete</a>
+                <div class="">
+                    <img class="card-img-top mb-3 w-auto" src="{{ '/images/news/thumbnail/'.$data->img }}">
+                </div>
+                <a href="{{ route('movies.index') }}" class="btn btn-light">Go back</a>
+                <a href="{{ route('movies.edit', $data->id) }}" class="btn btn-light">Edit</a>
+                <form class="d-inline-block" method="post" action="{{ route('movies.destroy', $data->id) }}">
+                    @method('DELETE')
+                    @csrf
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
             </div>
         </div>
 

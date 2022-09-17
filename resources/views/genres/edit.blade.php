@@ -8,7 +8,8 @@
 <div class="album py-5 bg-light">
     <div class="container">
 
-        <form class="row g-3 needs-validation" method="post" action="{{ route('genre-store', $data->id) }}" enctype="multipart/form-data">
+        <form class="row g-3 needs-validation" method="post" action="{{ route('genres.update', $data->id) }}">
+            @method('PATCH')
             @csrf
             <div class="col-12">
                 <label class="form-label" for="validationCustom01">Название</label> 

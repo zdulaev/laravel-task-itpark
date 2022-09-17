@@ -3,16 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
-use Intervention\Image\Facades\Image;
 use App\Models\Movie;
 use App\Models\Genre;
 
 class MovieController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Показать список ресурсов.
      *
      * @return \Illuminate\Http\Response
      */
@@ -20,68 +17,34 @@ class MovieController extends Controller
     {
         $data = Movie::with('genres')->where('published', true)->paginate(10);
 
-        return view('movies', ['data' => $data]);
+        return view('movies.index', ['data' => $data]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Обновить указанный ресурс в хранилище.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function store($id, Request $request)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
             'image' => 'image',
-            'genres' => 'required'
+            'genres' => 'array'
         ]);
-
         $movie = Movie::find($id);
         $movie->name = $request->input('name');
-        if ($request->has('genres')) {
-            $excess_genres = $movie->genres->keyBy('id')->keys()->diff(
-                collect(array_keys($request->input('genres')))
-            );
+        $movie->genres()->sync(array_keys((array)$request->input('genres')));
 
-            foreach ($excess_genres as $genre) {
-                DB::table('movie_genre')->where([
-                    ['movie_id', '=', $id],
-                    ['genre_id', '=', $genre],
-                ])->delete();
-            }
-
-            foreach ($request->input('genres') as $genre_key => $genre) {
-                $genres[] = [
-                    'movie_id' => $id,
-                    'genre_id' => $genre_key,
-                ];
-            }
-            DB::table('movie_genre')->insertOrIgnore($genres);
-        }
-
-        if (isset($request['image'])) {
-            $filename = $request['image']->getClientOriginalName();
-            
-            $request['image']->move(Storage::path('public/images/news/') . 'origin/', $filename);
-            
-            $thumbnail = Image::make(Storage::path('public/images/news/') . 'origin/' . $filename);
-            $thumbnail->fit(300, 300);
-            $thumbnail->save(Storage::path('public/images/news/') . 'thumbnail/' . $filename);
-            
-            $movie->img = $filename;
-        } else {
-
-            // default
-            $movie->img = '../default-movie.png';
-        }
-
+        $movie->img = set_images($request['image']);
         $movie->save();
-        return redirect()->route('movie-store', $id)->with('success', 'Обновил');
+        return redirect()->route('movies.show', $id)->with('success', 'Обновил');
     }
 
     /**
-     * Display the specified resource.
+     * Показать указанный ресурс.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -94,16 +57,55 @@ class MovieController extends Controller
             return view('errors.404');
         }
 
-        return view('movie', ['data' => $data]);
+        return view('movies.show', ['data' => $data]);
     }
 
     /**
-     * Show the specified resource in storage.
+     * Показать форму для создания нового ресурса.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        $genres = Genre::all();
+
+        return view('movies.create', ['genres' => $genres]);
+    }
+
+    /**
+     * Сохранить вновь созданный ресурс в хранилище.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'image' => 'image',
+            'genres' => 'array'
+        ]);
+
+        $movie = new Movie;
+        $movie->name = $request->input('name');
+        $movie->published = true;
+
+        $movie->img = set_images($request['image']);
+        $movie->save();
+
+        if ($request->has('genres')) {
+            $movie->genres()->attach(array_keys($request->input('genres')));
+        }
+        return redirect()->route('movies.show', $movie->id)->with('success', 'Создал');
+    }
+
+    /**
+     * Показать форму редактирования указанного ресурса.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update($id)
+    public function edit($id)
     {
         $data = Movie::with('genres')->where('published', true)->find($id);
 
@@ -113,11 +115,11 @@ class MovieController extends Controller
 
         $genres = Genre::all()->diff($data->genres);
 
-        return view('movie-update', ['data' => $data, 'genres' => $genres]);
+        return view('movies.edit', ['data' => $data, 'genres' => $genres]);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Удалить указанный ресурс из хранилища.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -125,7 +127,7 @@ class MovieController extends Controller
     public function destroy($id)
     {
         $data = Movie::find($id);
-        $return = redirect()->route('movies');
+        $return = redirect()->route('movies.index');
 
         if (isset($data)) {
             $data->delete();
